@@ -25,7 +25,7 @@ public class GlobalExceptionHandler : IExceptionHandler
         {
             ArgumentException => 400,
             KeyNotFoundException => 404,
-            UnauthorizedAccessException => 403,
+            UnauthorizedAccessException => 401,
             InvalidOperationException => 409,
             _ => 500
         };
