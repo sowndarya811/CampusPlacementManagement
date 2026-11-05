@@ -93,12 +93,16 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 // 9. Company Dependency Injection
 builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
 builder.Services.AddScoped<ICompanyService, CompanyService>();
+builder.Services.AddScoped<IStudentRepository, StudentRepository>();
+builder.Services.AddScoped<IStudentService, StudentService>();
 
 // 10. Authentication Dependency Injection
 builder.Services.AddScoped<IAuthService, AuthService>();
 
 // 11. Role Management Dependency Injection
 builder.Services.AddScoped<IRoleService, RoleService>();
+builder.Services.AddScoped<ICollegeRepository, CollegeRepository>();
+builder.Services.AddScoped<ICollegeService, CollegeService>();
 
 var app = builder.Build();
 Console.WriteLine(
