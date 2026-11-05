@@ -25,11 +25,13 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
     public DbSet<Placement> Placements => Set<Placement>();
 
+    public DbSet<PlacementApplication> Applications => Set<PlacementApplication>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
-        // Company Configuration
+        // 1. Company Configuration
         modelBuilder.Entity<Company>(entity =>
         {
             entity.HasKey(c => c.CompanyId);
@@ -46,7 +48,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
                 .IsUnique();
         });
 
-        // Student Configuration
+        // 2. Student Configuration
         modelBuilder.Entity<Student>(entity =>
         {
             entity.HasKey(s => s.StudentId);
@@ -90,7 +92,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
-        // College Configuration
+        // 3. College Configuration
         modelBuilder.Entity<College>(entity =>
         {
             entity.HasKey(c => c.CollegeId);
@@ -131,7 +133,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
                 .IsRequired();
         });
 
-        // Placement Officer Configuration
+        // 4. Placement Officer Configuration
         modelBuilder.Entity<PlacementOfficer>(entity =>
         {
             entity.HasKey(p => p.PlacementOfficerId);
@@ -169,7 +171,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             entity.HasIndex(p => p.CollegeId);
         });
 
-        // Placement Configuration
+        // 5. Placement Configuration
         modelBuilder.Entity<Placement>(entity =>
         {
             entity.HasKey(p => p.PlacementId);
@@ -205,19 +207,16 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             entity.Property(p => p.CreatedAt)
                 .IsRequired();
 
-            // Placement - Company
             entity.HasOne(p => p.Company)
                 .WithMany()
                 .HasForeignKey(p => p.CompanyId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Placement - College
             entity.HasOne(p => p.College)
                 .WithMany()
                 .HasForeignKey(p => p.CollegeId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Placement - Placement Officer
             entity.HasOne(p => p.PlacementOfficer)
                 .WithMany()
                 .HasForeignKey(p => p.PlacementOfficerId)
@@ -228,6 +227,52 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             entity.HasIndex(p => p.CompanyId);
 
             entity.HasIndex(p => p.ApplicationDeadline);
+        });
+
+        // 6. Placement Application Configuration
+        modelBuilder.Entity<PlacementApplication>(entity =>
+        {
+            // Explicit Primary Key
+            entity.HasKey(a => a.ApplicationId);
+
+            entity.Property(a => a.CoverLetter)
+                .HasMaxLength(2000);
+
+            entity.Property(a => a.ResumeUrl)
+                .HasMaxLength(500);
+
+            entity.Property(a => a.Status)
+                .HasConversion<int>()
+                .IsRequired();
+
+            entity.Property(a => a.AppliedAt)
+                .IsRequired();
+
+            entity.Property(a => a.UpdatedAt)
+                .IsRequired(false);
+
+            // Application - Student Relationship
+            entity.HasOne(a => a.Student)
+                .WithMany()
+                .HasForeignKey(a => a.StudentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Application - Placement Relationship
+            entity.HasOne(a => a.Placement)
+                .WithMany()
+                .HasForeignKey(a => a.PlacementId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Prevent Duplicate Applications
+            entity.HasIndex(a => new
+            {
+                a.StudentId,
+                a.PlacementId
+            }).IsUnique();
+
+            entity.HasIndex(a => a.PlacementId);
+
+            entity.HasIndex(a => a.StudentId);
         });
     }
 }

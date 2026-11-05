@@ -91,19 +91,25 @@ builder.Services.AddAuthorization();
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
-// 9. Company Dependency Injection
+// 9. Company Management Dependency Injection
 builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
 builder.Services.AddScoped<ICompanyService, CompanyService>();
+
+// 10. Student Management Dependency Injection
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 builder.Services.AddScoped<IStudentService, StudentService>();
 
-// 10. Authentication Dependency Injection
+// 11. Authentication Dependency Injection
 builder.Services.AddScoped<IAuthService, AuthService>();
 
-// 11. Role Management Dependency Injection
+// 12. Role Management Dependency Injection
 builder.Services.AddScoped<IRoleService, RoleService>();
+
+// 13. College Management Dependency Injection
 builder.Services.AddScoped<ICollegeRepository, CollegeRepository>();
 builder.Services.AddScoped<ICollegeService, CollegeService>();
+
+// 14. Placement Officer Management Dependency Injection
 builder.Services.AddScoped<
     IPlacementOfficerRepository,
     PlacementOfficerRepository>();
@@ -111,10 +117,18 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<
     IPlacementOfficerService,
     PlacementOfficerService>();
+
+// 15. Placement Management Dependency Injection
 builder.Services.AddScoped<IPlacementRepository, PlacementRepository>();
 builder.Services.AddScoped<IPlacementService, PlacementService>();
 
+// 16. Application Management Dependency Injection
+builder.Services.AddScoped<IApplicationRepository, ApplicationRepository>();
+builder.Services.AddScoped<IApplicationService, ApplicationService>();
+
 var app = builder.Build();
+
+// Admin Configuration Check
 Console.WriteLine(
     $"Admin Email Configured: {!string.IsNullOrWhiteSpace(app.Configuration["BootstrapAdmin:Email"])}");
 
@@ -124,7 +138,7 @@ Console.WriteLine(
 Console.WriteLine(
     $"Admin Name Configured: {!string.IsNullOrWhiteSpace(app.Configuration["BootstrapAdmin:FullName"])}");
 
-// 12. Seed Default Roles and Initial SuperAdmin
+// 17. Seed Default Roles and Initial SuperAdmin
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -132,7 +146,7 @@ using (var scope = app.Services.CreateScope())
     await IdentitySeeder.SeedRolesAsync(services);
 }
 
-// 13. Middleware Pipeline
+// 18. Middleware Pipeline
 app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
