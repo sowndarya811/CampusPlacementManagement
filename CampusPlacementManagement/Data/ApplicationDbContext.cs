@@ -27,6 +27,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
     public DbSet<PlacementApplication> Applications => Set<PlacementApplication>();
 
+    public DbSet<Interview> Interviews => Set<Interview>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -232,7 +234,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         // 6. Placement Application Configuration
         modelBuilder.Entity<PlacementApplication>(entity =>
         {
-            // Explicit Primary Key
             entity.HasKey(a => a.ApplicationId);
 
             entity.Property(a => a.CoverLetter)
@@ -251,19 +252,16 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             entity.Property(a => a.UpdatedAt)
                 .IsRequired(false);
 
-            // Application - Student Relationship
             entity.HasOne(a => a.Student)
                 .WithMany()
                 .HasForeignKey(a => a.StudentId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Application - Placement Relationship
             entity.HasOne(a => a.Placement)
                 .WithMany()
                 .HasForeignKey(a => a.PlacementId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Prevent Duplicate Applications
             entity.HasIndex(a => new
             {
                 a.StudentId,
@@ -273,6 +271,61 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             entity.HasIndex(a => a.PlacementId);
 
             entity.HasIndex(a => a.StudentId);
+        });
+
+        // 7. Interview Configuration
+        modelBuilder.Entity<Interview>(entity =>
+        {
+            entity.HasKey(i => i.InterviewId);
+
+            entity.Property(i => i.InterviewTime)
+                .IsRequired()
+                .HasMaxLength(30);
+
+            entity.Property(i => i.InterviewMode)
+                .IsRequired()
+                .HasMaxLength(50);
+
+            entity.Property(i => i.MeetingLink)
+                .HasMaxLength(500);
+
+            entity.Property(i => i.Location)
+                .HasMaxLength(300);
+
+            entity.Property(i => i.Feedback)
+                .HasMaxLength(2000);
+
+            entity.Property(i => i.Status)
+                .HasConversion<int>()
+                .IsRequired();
+
+            entity.Property(i => i.SelectionStatus)
+                .HasConversion<int>()
+                .IsRequired();
+
+            entity.Property(i => i.CreatedAt)
+                .IsRequired();
+
+            entity.Property(i => i.UpdatedAt)
+                .IsRequired(false);
+
+            // Interview - Application
+            entity.HasOne(i => i.Application)
+                .WithMany()
+                .HasForeignKey(i => i.ApplicationId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Interview - Placement Officer
+            entity.HasOne(i => i.PlacementOfficer)
+                .WithMany()
+                .HasForeignKey(i => i.PlacementOfficerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(i => i.ApplicationId);
+
+            entity.HasIndex(i => i.PlacementOfficerId);
+
+            entity.HasIndex(i => i.InterviewDate);
         });
     }
 }
