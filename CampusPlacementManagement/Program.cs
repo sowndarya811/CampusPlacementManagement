@@ -111,6 +111,8 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<
     IPlacementOfficerService,
     PlacementOfficerService>();
+builder.Services.AddScoped<IPlacementRepository, PlacementRepository>();
+builder.Services.AddScoped<IPlacementService, PlacementService>();
 
 var app = builder.Build();
 Console.WriteLine(

@@ -23,6 +23,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
     public DbSet<PlacementOfficer> PlacementOfficers => Set<PlacementOfficer>();
 
+    public DbSet<Placement> Placements => Set<Placement>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -154,19 +156,78 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             entity.Property(p => p.ApprovedAt)
                 .IsRequired(false);
 
-            // PlacementOfficer - ApplicationUser
             entity.HasOne(p => p.User)
                 .WithOne()
                 .HasForeignKey<PlacementOfficer>(p => p.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // PlacementOfficer - College
             entity.HasOne(p => p.College)
                 .WithMany()
                 .HasForeignKey(p => p.CollegeId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             entity.HasIndex(p => p.CollegeId);
+        });
+
+        // Placement Configuration
+        modelBuilder.Entity<Placement>(entity =>
+        {
+            entity.HasKey(p => p.PlacementId);
+
+            entity.Property(p => p.JobTitle)
+                .IsRequired()
+                .HasMaxLength(150);
+
+            entity.Property(p => p.JobDescription)
+                .IsRequired();
+
+            entity.Property(p => p.JobLocation)
+                .IsRequired()
+                .HasMaxLength(150);
+
+            entity.Property(p => p.EmploymentType)
+                .IsRequired()
+                .HasMaxLength(50);
+
+            entity.Property(p => p.SalaryPackage)
+                .HasPrecision(10, 2);
+
+            entity.Property(p => p.MinimumCGPA)
+                .HasPrecision(4, 2);
+
+            entity.Property(p => p.EligibleDepartments)
+                .IsRequired();
+
+            entity.Property(p => p.Status)
+                .HasConversion<int>()
+                .IsRequired();
+
+            entity.Property(p => p.CreatedAt)
+                .IsRequired();
+
+            // Placement - Company
+            entity.HasOne(p => p.Company)
+                .WithMany()
+                .HasForeignKey(p => p.CompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Placement - College
+            entity.HasOne(p => p.College)
+                .WithMany()
+                .HasForeignKey(p => p.CollegeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Placement - Placement Officer
+            entity.HasOne(p => p.PlacementOfficer)
+                .WithMany()
+                .HasForeignKey(p => p.PlacementOfficerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(p => p.CollegeId);
+
+            entity.HasIndex(p => p.CompanyId);
+
+            entity.HasIndex(p => p.ApplicationDeadline);
         });
     }
 }

@@ -198,6 +198,82 @@ namespace CampusPlacementManagement.Migrations
                     b.ToTable("Companies");
                 });
 
+            modelBuilder.Entity("CampusPlacementManagement.Models.Placement", b =>
+                {
+                    b.Property<int>("PlacementId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PlacementId"));
+
+                    b.Property<DateTime>("ApplicationDeadline")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CollegeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DriveDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("EligibleDepartments")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("EligibleGraduationYear")
+                        .HasColumnType("int");
+
+                    b.Property<string>("EmploymentType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("JobDescription")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("JobLocation")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("JobTitle")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<decimal>("MinimumCGPA")
+                        .HasPrecision(4, 2)
+                        .HasColumnType("decimal(4,2)");
+
+                    b.Property<int>("PlacementOfficerId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("SalaryPackage")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("PlacementId");
+
+                    b.HasIndex("ApplicationDeadline");
+
+                    b.HasIndex("CollegeId");
+
+                    b.HasIndex("CompanyId");
+
+                    b.HasIndex("PlacementOfficerId");
+
+                    b.ToTable("Placements");
+                });
+
             modelBuilder.Entity("CampusPlacementManagement.Models.PlacementOfficer", b =>
                 {
                     b.Property<int>("PlacementOfficerId")
@@ -435,6 +511,33 @@ namespace CampusPlacementManagement.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("CampusPlacementManagement.Models.Placement", b =>
+                {
+                    b.HasOne("CampusPlacementManagement.Models.College", "College")
+                        .WithMany()
+                        .HasForeignKey("CollegeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("CampusPlacementManagement.Models.Company", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("CampusPlacementManagement.Models.PlacementOfficer", "PlacementOfficer")
+                        .WithMany()
+                        .HasForeignKey("PlacementOfficerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("College");
+
+                    b.Navigation("Company");
+
+                    b.Navigation("PlacementOfficer");
                 });
 
             modelBuilder.Entity("CampusPlacementManagement.Models.PlacementOfficer", b =>
