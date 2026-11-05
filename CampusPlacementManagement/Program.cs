@@ -130,6 +130,10 @@ builder.Services.AddScoped<IApplicationService, ApplicationService>();
 builder.Services.AddScoped<IInterviewRepository, InterviewRepository>();
 builder.Services.AddScoped<IInterviewService, InterviewService>();
 
+// 18. Notification Management Dependency Injection
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+
 var app = builder.Build();
 
 // Admin Configuration Check
@@ -142,7 +146,7 @@ Console.WriteLine(
 Console.WriteLine(
     $"Admin Name Configured: {!string.IsNullOrWhiteSpace(app.Configuration["BootstrapAdmin:FullName"])}");
 
-// 18. Seed Default Roles and Initial SuperAdmin
+// 19. Seed Default Roles and Initial SuperAdmin
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -150,7 +154,7 @@ using (var scope = app.Services.CreateScope())
     await IdentitySeeder.SeedRolesAsync(services);
 }
 
-// 19. Middleware Pipeline
+// 20. Middleware Pipeline
 app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())

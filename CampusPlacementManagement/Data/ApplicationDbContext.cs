@@ -29,6 +29,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
     public DbSet<Interview> Interviews => Set<Interview>();
 
+    public DbSet<Notification> Notifications => Set<Notification>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -309,13 +311,11 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             entity.Property(i => i.UpdatedAt)
                 .IsRequired(false);
 
-            // Interview - Application
             entity.HasOne(i => i.Application)
                 .WithMany()
                 .HasForeignKey(i => i.ApplicationId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Interview - Placement Officer
             entity.HasOne(i => i.PlacementOfficer)
                 .WithMany()
                 .HasForeignKey(i => i.PlacementOfficerId)
@@ -326,6 +326,45 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             entity.HasIndex(i => i.PlacementOfficerId);
 
             entity.HasIndex(i => i.InterviewDate);
+        });
+
+        // 8. Notification Configuration
+        modelBuilder.Entity<Notification>(entity =>
+        {
+            entity.HasKey(n => n.NotificationId);
+
+            entity.Property(n => n.UserId)
+                .IsRequired()
+                .HasMaxLength(450);
+
+            entity.Property(n => n.Title)
+                .IsRequired()
+                .HasMaxLength(150);
+
+            entity.Property(n => n.Message)
+                .IsRequired()
+                .HasMaxLength(2000);
+
+            entity.Property(n => n.Type)
+                .IsRequired()
+                .HasMaxLength(50);
+
+            entity.Property(n => n.IsRead)
+                .HasDefaultValue(false);
+
+            entity.Property(n => n.CreatedAt)
+                .IsRequired();
+
+            entity.Property(n => n.ReadAt)
+                .IsRequired(false);
+
+            entity.HasIndex(n => n.UserId);
+
+            entity.HasIndex(n => new
+            {
+                n.UserId,
+                n.IsRead
+            });
         });
     }
 }
