@@ -1,6 +1,5 @@
 ﻿
 using CampusPlacementManagement.Models;
-using CampusPlacementManagement.Enums;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
