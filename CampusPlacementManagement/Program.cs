@@ -23,7 +23,8 @@ builder.Services.AddOpenApi();
 // 3. Database Connection
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")));
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        sqlOptions => sqlOptions.CommandTimeout(180)));
 
 // 4. ASP.NET Core Identity Configuration
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
@@ -103,6 +104,13 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<ICollegeRepository, CollegeRepository>();
 builder.Services.AddScoped<ICollegeService, CollegeService>();
+builder.Services.AddScoped<
+    IPlacementOfficerRepository,
+    PlacementOfficerRepository>();
+
+builder.Services.AddScoped<
+    IPlacementOfficerService,
+    PlacementOfficerService>();
 
 var app = builder.Build();
 Console.WriteLine(

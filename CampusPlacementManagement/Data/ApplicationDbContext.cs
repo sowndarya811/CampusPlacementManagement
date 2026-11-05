@@ -1,5 +1,6 @@
 ﻿
 using CampusPlacementManagement.Models;
+using CampusPlacementManagement.Enums;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,12 +21,13 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
     public DbSet<College> Colleges => Set<College>();
 
+    public DbSet<PlacementOfficer> PlacementOfficers => Set<PlacementOfficer>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // ASP.NET Core Identity configuration
         base.OnModelCreating(modelBuilder);
 
-        // Company table configuration
+        // Company Configuration
         modelBuilder.Entity<Company>(entity =>
         {
             entity.HasKey(c => c.CompanyId);
@@ -42,7 +44,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
                 .IsUnique();
         });
 
-        // Student table configuration
+        // Student Configuration
         modelBuilder.Entity<Student>(entity =>
         {
             entity.HasKey(s => s.StudentId);
@@ -71,25 +73,22 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             entity.Property(s => s.Status)
                 .HasConversion<int>();
 
-            // Unique register number within a college
             entity.HasIndex(s => new
             {
                 s.RegisterNumber,
                 s.CollegeId
             }).IsUnique();
 
-            // One Identity user per student profile
             entity.HasIndex(s => s.UserId)
                 .IsUnique();
 
-            // Student - ApplicationUser relationship
             entity.HasOne<ApplicationUser>()
                 .WithMany()
                 .HasForeignKey(s => s.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
-        // College table configuration
+        // College Configuration
         modelBuilder.Entity<College>(entity =>
         {
             entity.HasKey(c => c.CollegeId);
@@ -128,6 +127,46 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
             entity.Property(c => c.CreatedAt)
                 .IsRequired();
+        });
+
+        // Placement Officer Configuration
+        modelBuilder.Entity<PlacementOfficer>(entity =>
+        {
+            entity.HasKey(p => p.PlacementOfficerId);
+
+            entity.Property(p => p.UserId)
+                .IsRequired();
+
+            entity.HasIndex(p => p.UserId)
+                .IsUnique();
+
+            entity.Property(p => p.Designation)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            entity.Property(p => p.Status)
+                .HasConversion<int>()
+                .IsRequired();
+
+            entity.Property(p => p.ApprovedBy)
+                .IsRequired(false);
+
+            entity.Property(p => p.ApprovedAt)
+                .IsRequired(false);
+
+            // PlacementOfficer - ApplicationUser
+            entity.HasOne(p => p.User)
+                .WithOne()
+                .HasForeignKey<PlacementOfficer>(p => p.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // PlacementOfficer - College
+            entity.HasOne(p => p.College)
+                .WithMany()
+                .HasForeignKey(p => p.CollegeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(p => p.CollegeId);
         });
     }
 }
